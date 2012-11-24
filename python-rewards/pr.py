@@ -13,7 +13,7 @@ from BeautifulSoup import BeautifulSoup
 import requests
 
 login_host = 'secure.bidambassadors.com'
-login_path = '/office/?action=accountAccess'
+
 
 my_config = {'verbose': sys.stderr}
 
@@ -46,13 +46,32 @@ def parse_command_line():
         args.zpass = getpass.getpass()
     return parser, args
 
+def log_response(r):
+    logging.warn("""
+                 Status code - {0},
+                 Headers - {1}
+                 Encoding - {2}
+                 URL - {3}
+                 Cookies - {4}
+                 """.format(
+        r.status_code, r.headers, r.encoding, r.url, r.cookies
+        ))
+
 def login(args):
-    params = {'username': args.zuser, 'password': args.zpass }
-    login_url = full_url(login_path)
-    r = s.post(login_url, config=my_config, data=params)
-    print r.status_code
-    print r.headers
-    print r.encoding
+    post = {
+        'username': args.zuser,
+        'password': args.zpass,
+        'agree' : 0,
+        'submit' : 'Login'
+    }
+
+    login_url = full_url('office')
+    query = { 'action' : 'accountAccess' }
+
+    logging.debug("post parms: {0}".format(post))
+
+    r = s.get(login_url, config=my_config, data=post, params=query)
+    log_response(r)
     html = r.text.encode("utf-8")
     return html
 
@@ -83,23 +102,24 @@ def click_register_ad(html):
     return html
 
 def submit_ad(html, args):
-    url = 'https://secure.bidambassadors.com/index.asp?pass=Add'
-    params = {
+    url = full_url('office/marketing/ads/report-it/index.asp')
+    query = { 'pass' : 'Add' }
+    post = {
         'placead' : "http://freebidsforpennyauction.blogspot.com/",
         'adtype': "Ezine",
-        'viewableat': args.adurl,
-        'Submit' : 'Submit',
+        'url': args.adurl,
+        'MAX_FILE_SIZE' : 50000,
+        'memo': '',
+        'Submit' : 'Confirm Your Ad',
         'approvedtext' : ""
     }
 
     soup = BeautifulSoup(html)
 
 
-    r = s.post(url, data=params, config=my_config)
+    r = s.post(url, data=post, config=my_config, params=query)
 
-    logging.warn("Status code - {0}, Headers - {1} Encoding - {2}".format(
-        r.status_code, r.headers, r.encoding
-    ))
+    log_response(r)
     html = r.text.encode("utf-8")
     return html
 
@@ -143,6 +163,8 @@ if __name__ == '__main__':
     parser, args = parse_command_line()
 
     html = login(args)
+    #logging.warn("login html: {0}".format(html))
+    #raise Exception(html)
 #    html = click_place_ad(html) # simulate clicking on "PLACE YOUR AD"
 #    html = click_register_ad(html) # click on Register your Ad to Qualify for Today's Cash Rewards
 #    print "*** submitting ad ***"
