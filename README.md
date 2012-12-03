@@ -1,9 +1,9 @@
 bids that give autoposter
 ========================
 
-[Bids That Give](http://www.everybidhelpsakid.com/princepawn) is a
+[Bids That Give](http://www.everybidhelpsakid.com/thequietcenter) is a
 penny auction website. Affiliates of this penny auction are required
-to post a classifieds ad somewhere on the internet each day and record
+to post a classifieds ad somewhere on the internet each day and report
 the URL of their post in their back-office.
 
 This free source code addresses both of these requirements.
@@ -57,3 +57,6 @@ users = {
 
 }
 ```
+
+I'm sorry about the left-over zeekisms in this code, but it works. I use
+it daily.

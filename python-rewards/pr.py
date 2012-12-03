@@ -135,7 +135,7 @@ def email_confirmation(email, html, user):
 
     # me == the sender's email address
     # you == the recipient's email address
-    msg['Subject'] = 'Zeek posting for {0}'.format(user)
+    msg['Subject'] = 'BTG posting for {0}'.format(user)
     msg['To'] = email
     msg['From'] = 'thequietcenter@gmail.com'
 
